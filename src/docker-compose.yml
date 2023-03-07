@@ -1,0 +1,51 @@
+version: '3.9'
+
+networks:
+  net:
+    driver: bridge
+
+services:
+
+  api:
+    container_name: kube-news-api
+    build:
+      context: .
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DB_DATABASE: kube-news
+      DB_USERNAME: kube-news
+      DB_PASSWORD: kube#123465
+      DB_HOST: postgres
+    ports:
+      - 80:8080
+    networks:
+      - net
+
+  postgres:
+    container_name: kube-news-postgres
+    image: postgres:15.2
+    restart: always
+    environment:
+      POSTGRES_DB: kube-news
+      POSTGRES_USER: kube-news
+      POSTGRES_PASSWORD: kube#123465
+    volumes:
+      - ~/.kube-news/postgresql/data:/var/lib/postgresql/data
+    networks:
+      - net
+  
+  pgadmin:
+    container_name: kube-news-pgadmin
+    image: dpage/pgadmin4:6.20
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: teste@teste.com
+      PGADMIN_DEFAULT_PASSWORD: kube#123
+    ports:
+      - 8081:80
+    networks:
+      - net
